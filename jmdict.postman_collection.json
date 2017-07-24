@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "jmdict",
-		"_postman_id": "322a5bbc-7a3c-6f56-e4fc-a39cbde1ee0c",
+		"_postman_id": "a222e81b-135d-fb30-8407-99cee2583dde",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -10,7 +10,7 @@
 		{
 			"name": "jmdict romaji",
 			"request": {
-				"url": "0.0.0.0:3000/search",
+				"url": "localhost:3000/search",
 				"method": "POST",
 				"header": [
 					{
@@ -30,7 +30,7 @@
 		{
 			"name": "jmdict hira/katakana",
 			"request": {
-				"url": "0.0.0.0:3000/search",
+				"url": "localhost:3000/search",
 				"method": "POST",
 				"header": [
 					{
@@ -42,6 +42,26 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n\t\"search\": {\n        \"term\": \"やわらかい\",\n        \"path\": \"kana[].text\",\n        \"levenshtein_distance\": 0\n    },\n    \"boost\" : [\n    \t{\n\t        \"path\":\"commonness\",\n\t        \"boost_fun\": \"Log10\",\n\t        \"param\": 1\n\t    },{\n\t        \"path\":\"kana[].commonness\",\n\t        \"boost_fun\": \"Log10\",\n\t        \"param\": 1\n\t    }\n    ],\n    \"top\": 10,\n    \"skip\": 0\n}\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "jmdict romaji suggest",
+			"request": {
+				"url": "localhost:3000/suggest",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"suggest\":[\n    \t{\n\t        \"term\": \"weich\",\n\t        \"path\": \"meanings.ger[].text\",\n\t        \"starts_with\": true\n\t    },\n\t\t{\n\t        \"term\": \"weich\",\n\t        \"path\": \"meanings.eng[]\",\n\t        \"starts_with\": true\n\t\t}\n    ],\n    \"top\": 10,\n    \"skip\": 0\n}\n"
 				},
 				"description": ""
 			},
