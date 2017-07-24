@@ -1,0 +1,7 @@
+[package]
+name = "jmdict_search"
+version = "0.1.0"
+authors = ["Pascal Seitz <pascal.seitz@gmail.com>"]
+
+[dependencies]
+native_search = { git = "https://github.com/pseitz/native_search" }
