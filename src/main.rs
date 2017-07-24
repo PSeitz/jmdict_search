@@ -3,10 +3,22 @@ extern crate native_search;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufRead};
-
+use std::env;
 fn main() {
-    println!("Hello, world!");
-    create_jmdict_index();
+    let args: Vec<_> = env::args().collect();
+    if args.len() < 1 {
+        panic!("use create oder start_server as argument");
+    }
+    if args[1] == "create" {
+        println!("creating");
+        create_jmdict_index();
+    }else if args[1] == "start_server"{
+        println!("starting server");
+        native_search::server::start_server("jmdict".to_string());
+    }else{
+        panic!("use create oder start_server as argument");
+    }
+
 }
 
 
