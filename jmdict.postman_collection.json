@@ -1,0 +1,51 @@
+{
+	"variables": [],
+	"info": {
+		"name": "jmdict",
+		"_postman_id": "322a5bbc-7a3c-6f56-e4fc-a39cbde1ee0c",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "jmdict romaji",
+			"request": {
+				"url": "0.0.0.0:3000/search",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"or\":[\n    \t{\n    \t\t\"search\": {\n\t\t        \"term\": \"weich\",\n\t\t        \"path\": \"meanings.ger[].text\",\n\t\t        \"levenshtein_distance\": 1\n\t\t    },\n\t\t    \"boost\" : [\n\t\t    \t{\n\t\t\t        \"path\":\"commonness\",\n\t\t\t        \"boost_fun\": \"Log10\",\n\t\t\t        \"param\": 1\n\t\t\t    },{\n\t\t\t        \"path\":\"meanings.ger[].rank\",\n\t\t\t        \"expression\": \"10 / $SCORE\"\n\t\t\t    }\n\t\t    ]\n    \t},\n    \t{\n    \t\t\"search\": {\n\t\t        \"term\": \"weich\",\n\t\t        \"path\": \"meanings.eng[]\",\n\t\t        \"levenshtein_distance\": 1\n\t\t    },\n\t\t    \"boost\" : [\n\t\t    \t{\n\t\t\t        \"path\":\"commonness\",\n\t\t\t        \"boost_fun\": \"Log10\",\n\t\t\t        \"param\": 1\n\t\t\t    }\n\t\t    ]\n    \t}\n    ],\n    \"top\": 10,\n    \"skip\": 0\n}\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "jmdict hira/katakana",
+			"request": {
+				"url": "0.0.0.0:3000/search",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"search\": {\n        \"term\": \"やわらかい\",\n        \"path\": \"kana[].text\",\n        \"levenshtein_distance\": 0\n    },\n    \"boost\" : [\n    \t{\n\t        \"path\":\"commonness\",\n\t        \"boost_fun\": \"Log10\",\n\t        \"param\": 1\n\t    },{\n\t        \"path\":\"kana[].commonness\",\n\t        \"boost_fun\": \"Log10\",\n\t        \"param\": 1\n\t    }\n    ],\n    \"top\": 10,\n    \"skip\": 0\n}\n"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
