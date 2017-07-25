@@ -12,6 +12,7 @@ fn main() {
     if args[1] == "create" {
         println!("creating");
         create_jmdict_index();
+        create_suggest_index();
     }else if args[1] == "start_server"{
         println!("starting server");
         native_search::server::start_server("jmdict".to_string());
@@ -57,5 +58,32 @@ fn create_jmdict_index() -> Result<(), io::Error> {
     let mut s = String::new();
     f.read_to_string(&mut s)?;
     println!("{:?}", native_search::create::create_indices("jmdict", &s,  indices));
+    Ok(())
+}
+
+
+
+fn create_suggest_index() -> Result<(), io::Error> {
+    let indices = r#"
+    [
+        {
+            "boost": "commonness",
+            "options": { "boost_type": "int" }
+        },
+        { "fulltext": "text" }
+    ]
+    "#;
+    let mut f = File::open("deWords.json")?;
+    let mut s = String::new();
+    f.read_to_string(&mut s)?;
+    println!("{:?}", native_search::create::create_indices("desuggest", &s,  indices));
+
+
+    let mut f = File::open("engWords.json")?;
+    let mut s = String::new();
+    f.read_to_string(&mut s)?;
+    println!("{:?}", native_search::create::create_indices("engsuggest", &s,  indices));
+
+
     Ok(())
 }
