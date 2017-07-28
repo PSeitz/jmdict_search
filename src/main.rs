@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate serde_json;
 extern crate native_search;
 
 use std::fs::File;
@@ -12,7 +14,7 @@ fn main() {
     if args[1] == "create" {
         println!("creating");
         create_jmdict_index();
-        create_suggest_index();
+        // create_suggest_index();
     }else if args[1] == "start_server"{
         println!("starting server");
         native_search::server::start_server("jmdict".to_string());
@@ -58,32 +60,53 @@ fn create_jmdict_index() -> Result<(), io::Error> {
     let mut s = String::new();
     f.read_to_string(&mut s)?;
     println!("{:?}", native_search::create::create_indices("jmdict", &s,  indices));
-    Ok(())
-}
 
 
+    {
+        let mut pers = native_search::persistence::Persistence::load("jmdict".to_string()).expect("Could not load persistence");
+        let config = json!({"path": "meanings.ger[].text"});
+        let mut f = File::open("deWords.json")?;
+        let mut s = String::new();
+        f.read_to_string(&mut s)?;
 
-fn create_suggest_index() -> Result<(), io::Error> {
-    let indices = r#"
-    [
-        {
-            "boost": "commonness",
-            "options": { "boost_type": "int" }
-        },
-        { "fulltext": "text" }
-    ]
-    "#;
-    let mut f = File::open("deWords.json")?;
-    let mut s = String::new();
-    f.read_to_string(&mut s)?;
-    println!("{:?}", native_search::create::create_indices("desuggest", &s,  indices));
+        native_search::create::add_token_values_to_tokens(&mut pers, &s, &config.to_string()).expect("Could not add token values");
 
+        let config = json!({"path": "meanings.eng[]"});
+        let mut f = File::open("enWords.json")?;
+        let mut s = String::new();
+        f.read_to_string(&mut s)?;
 
-    let mut f = File::open("engWords.json")?;
-    let mut s = String::new();
-    f.read_to_string(&mut s)?;
-    println!("{:?}", native_search::create::create_indices("engsuggest", &s,  indices));
+        native_search::create::add_token_values_to_tokens(&mut pers, &s, &config.to_string()).expect("Could not add token values");
+
+    }
 
 
     Ok(())
 }
+
+
+
+// fn create_suggest_index() -> Result<(), io::Error> {
+//     let indices = r#"
+//     [
+//         {
+//             "boost": "commonness",
+//             "options": { "boost_type": "int" }
+//         },
+//         { "fulltext": "text" }
+//     ]
+//     "#;
+//     let mut f = File::open("deWords.json")?;
+//     let mut s = String::new();
+//     f.read_to_string(&mut s)?;
+//     println!("{:?}", native_search::create::create_indices("desuggest", &s,  indices));
+
+
+//     let mut f = File::open("engWords.json")?;
+//     let mut s = String::new();
+//     f.read_to_string(&mut s)?;
+//     println!("{:?}", native_search::create::create_indices("engsuggest", &s,  indices));
+
+
+//     Ok(())
+// }
