@@ -2,11 +2,15 @@
 extern crate serde_json;
 extern crate native_search;
 
+#[macro_use] extern crate log;
+extern crate env_logger;
+
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufRead};
 use std::env;
 fn main() {
+    env_logger::init();
     let args: Vec<_> = env::args().collect();
     if args.len() < 1 {
         panic!("use create oder start_server as argument");
@@ -16,7 +20,7 @@ fn main() {
         create_jmdict_index();
         // create_suggest_index();
     }else if args[1] == "start_server"{
-        println!("starting server");
+        info!("starting server");
         native_search::server::start_server("jmdict".to_string());
     }else{
         panic!("use create oder start_server as argument");
