@@ -1,6 +1,6 @@
 #[macro_use]
 extern crate serde_json;
-extern crate native_search;
+extern crate search_lib;
 
 #[macro_use] extern crate log;
 extern crate env_logger;
@@ -21,7 +21,7 @@ fn main() {
         // create_suggest_index();
     }else if args[1] == "start_server"{
         info!("starting server");
-        native_search::server::start_server("jmdict".to_string());
+        // search_lib::server::start_server("jmdict".to_string());
     }else{
         panic!("use create oder start_server as argument");
     }
@@ -63,24 +63,24 @@ fn create_jmdict_index() -> Result<(), io::Error> {
     let mut f = File::open("jmdict.json")?;
     let mut s = String::new();
     f.read_to_string(&mut s)?;
-    println!("{:?}", native_search::create::create_indices("jmdict", &s,  indices));
+    println!("{:?}", search_lib::create::create_indices("jmdict", &s,  indices));
 
 
     {
-        let mut pers = native_search::persistence::Persistence::load("jmdict".to_string()).expect("Could not load persistence");
+        let mut pers = search_lib::persistence::Persistence::load("jmdict".to_string()).expect("Could not load persistence");
         let config = json!({"path": "meanings.ger[].text"});
         let mut f = File::open("deWords.json")?;
         let mut s = String::new();
         f.read_to_string(&mut s)?;
 
-        native_search::create::add_token_values_to_tokens(&mut pers, &s, &config.to_string()).expect("Could not add token values");
+        search_lib::create::add_token_values_to_tokens(&mut pers, &s, &config.to_string()).expect("Could not add token values");
 
         let config = json!({"path": "meanings.eng[]"});
         let mut f = File::open("enWords.json")?;
         let mut s = String::new();
         f.read_to_string(&mut s)?;
 
-        native_search::create::add_token_values_to_tokens(&mut pers, &s, &config.to_string()).expect("Could not add token values");
+        search_lib::create::add_token_values_to_tokens(&mut pers, &s, &config.to_string()).expect("Could not add token values");
 
     }
 
@@ -103,13 +103,13 @@ fn create_jmdict_index() -> Result<(), io::Error> {
 //     let mut f = File::open("deWords.json")?;
 //     let mut s = String::new();
 //     f.read_to_string(&mut s)?;
-//     println!("{:?}", native_search::create::create_indices("desuggest", &s,  indices));
+//     println!("{:?}", search_lib::create::create_indices("desuggest", &s,  indices));
 
 
 //     let mut f = File::open("engWords.json")?;
 //     let mut s = String::new();
 //     f.read_to_string(&mut s)?;
-//     println!("{:?}", native_search::create::create_indices("engsuggest", &s,  indices));
+//     println!("{:?}", search_lib::create::create_indices("engsuggest", &s,  indices));
 
 
 //     Ok(())
