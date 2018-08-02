@@ -60,10 +60,25 @@ fn create_jmdict_index() -> Result<(), io::Error> {
     }
     ]
     "#;
-    let mut f = File::open("jmdict.json")?;
-    let mut s = String::new();
-    f.read_to_string(&mut s)?;
-    println!("{:?}", search_lib::create::create_indices("jmdict", &s,  indices));
+    // let mut f = File::open("jmdict_split.json")?;
+    // let mut s = String::new();
+    // f.read_to_string(&mut s)?;
+    // println!("{:?}", search_lib::create::create_indices("jmdict", &s,  indices));
+
+    // create_indices_from_file(
+    //     persistence: &mut Persistence,
+    //     data_path: &str,
+    //     indices: &str,
+    //     create_cache: Option<CreateCache>,
+    //     load_persistence: bool,
+    // )
+    search_lib::create::create_indices_from_file(
+        &mut search_lib::persistence::Persistence::create("jmdict".to_string()).unwrap(),
+        "jmdict_split.json",
+        indices,
+        None,
+        false,
+    ).unwrap();
 
 
     {
