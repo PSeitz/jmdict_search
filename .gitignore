@@ -1,5 +1,6 @@
 /target/
 **/*.rs.bk
 /jmdict
+/jmdict*
 /desuggest
 /engsuggest

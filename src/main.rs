@@ -7,17 +7,17 @@ extern crate env_logger;
 
 use std::fs::File;
 use std::io::prelude::*;
-use std::io::{self, BufRead};
+use std::io::{self};
 use std::env;
-fn main() {
-    env_logger::init();
+fn main() -> Result<(), io::Error>{
+    env_logger::init().unwrap();
     let args: Vec<_> = env::args().collect();
-    if args.len() < 1 {
+    if args.len() <= 1 {
         panic!("use create oder start_server as argument");
     }
     if args[1] == "create" {
         println!("creating");
-        create_jmdict_index();
+        create_jmdict_index()?;
         // create_suggest_index();
     }else if args[1] == "start_server"{
         info!("starting server");
@@ -26,39 +26,64 @@ fn main() {
         panic!("use create oder start_server as argument");
     }
 
+    Ok(())
 }
 
 
 fn create_jmdict_index() -> Result<(), io::Error> {
+    // let indices = r#"
+    // [
+    // {
+    //     "boost": "commonness",
+    //     "options": { "boost_type": "int" }
+    // },
+    // { "fulltext": "kanji[].text" },
+    // { "fulltext": "kana[].text" },
+    // {
+    //     "fulltext": "meanings.ger[].text",
+    //     "options": { "tokenize": true  }
+    // },
+    // {
+    //     "boost": "meanings.ger[].rank",
+    //     "options": { "boost_type": "int" }
+    // },
+    // {
+    //     "fulltext": "meanings.eng[]",
+    //     "options": { "tokenize": true  }
+    // },
+    // {
+    //     "boost": "kanji[].commonness",
+    //     "options": { "boost_type": "int" }
+    // },
+    // {
+    //     "boost": "kana[].commonness",
+    //     "options": { "boost_type": "int" }
+    // }
+    // ]
+    // "#;
+
+
+    // BoostTextLocality,
+    // BoostingFieldData,
+    // Search,
+    // Filters,
+    // Facets,
+    // Select,
+    // WhyFound,
+    // Highlight,
+    // PhraseBoost,
+
     let indices = r#"
-    [
     {
-        "boost": "commonness",
-        "options": { "boost_type": "int" }
-    },
-    { "fulltext": "kanji[].text" },
-    { "fulltext": "kana[].text" },
-    {
-        "fulltext": "meanings.ger[].text",
-        "options": { "tokenize": true  }
-    },
-    {
-        "boost": "meanings.ger[].rank",
-        "options": { "boost_type": "int" }
-    },
-    {
-        "fulltext": "meanings.eng[]",
-        "options": { "tokenize": true  }
-    },
-    {
-        "boost": "kanji[].commonness",
-        "options": { "boost_type": "int" }
-    },
-    {
-        "boost": "kana[].commonness",
-        "options": { "boost_type": "int" }
+        "commonness":{"boost":{"boost_type":"int"}},
+        "kanji[].commonness":{"boost":{"boost_type":"int"}},
+        "kana[].commonness":{"boost":{"boost_type":"int"}},
+        "meanings.ger[].rank":{"boost":{"boost_type":"int"}},
+        "kanji[].text": {"fulltext":{"tokenize":false}},
+        "kana[].text": {"fulltext":{"tokenize":false}},
+        "meanings.ger[].text": {"fulltext":{"tokenize":true}}
+        "meanings.eng[]": {"fulltext":{"tokenize":true}}
     }
-    ]
     "#;
     // let mut f = File::open("jmdict_split.json")?;
     // let mut s = String::new();
