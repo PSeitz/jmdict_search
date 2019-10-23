@@ -131,7 +131,6 @@ fn create_jmdict_index(indices: &str, target: &str) -> Result<(), io::Error> {
         &mut veloci::persistence::Persistence::create(target.to_string()).unwrap(),
         "jmdict_split.json",
         indices,
-        None,
         false,
     ));
 
@@ -157,7 +156,6 @@ fn create_jmdict_index(indices: &str, target: &str) -> Result<(), io::Error> {
 
     Ok(())
 }
-
 
 
 // fn create_suggest_index() -> Result<(), io::Error> {
