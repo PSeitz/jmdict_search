@@ -1,6 +1,6 @@
 #[macro_use]
 extern crate serde_json;
-extern crate search_lib;
+extern crate veloci;
 
 #[macro_use] extern crate log;
 extern crate env_logger;
@@ -17,11 +17,52 @@ fn main() -> Result<(), io::Error>{
     }
     if args[1] == "create" {
         println!("creating");
-        create_jmdict_index()?;
+        create_jmdict_index(r#"
+            [commonness.boost]
+            boost_type = 'int'
+            ["kanji[].commonness".boost]
+            boost_type = 'int'
+            ["kana[].commonness".boost]
+            boost_type = 'int'
+            ["meanings.ger[].rank".boost]
+            boost_type = 'int'
+            ["kanji[].text".fulltext]
+            tokenize = false
+            ["kana[].text".fulltext]
+            tokenize = false
+            ["meanings.ger[].text".fulltext]
+            tokenize = true
+            ["meanings.eng[]".fulltext]
+            tokenize = true
+            "#,
+            "jmdict"
+        )?;
         // create_suggest_index();
+    }else if args[1] == "create_android"{
+        println!("creating");
+        create_jmdict_index(r#"
+            [commonness.boost]
+            boost_type = 'int'
+            ["kanji[].commonness".boost]
+            boost_type = 'int'
+            ["kana[].commonness".boost]
+            boost_type = 'int'
+            ["meanings.ger[].rank".boost]
+            boost_type = 'int'
+            ["kanji[].text".fulltext]
+            tokenize = false
+            ["kana[].text".fulltext]
+            tokenize = false
+            ["meanings.ger[].text".fulltext]
+            tokenize = true
+            ["meanings.eng[]".fulltext]
+            tokenize = true
+            "#,
+            "jmdict_android"
+        )?;
     }else if args[1] == "start_server"{
         info!("starting server");
-        // search_lib::server::start_server("jmdict".to_string());
+        // veloci::server::start_server("jmdict".to_string());
     }else{
         panic!("use create oder start_server as argument");
     }
@@ -30,7 +71,7 @@ fn main() -> Result<(), io::Error>{
 }
 
 
-fn create_jmdict_index() -> Result<(), io::Error> {
+fn create_jmdict_index(indices: &str, target: &str) -> Result<(), io::Error> {
     // let indices = r#"
     // [
     // {
@@ -73,22 +114,11 @@ fn create_jmdict_index() -> Result<(), io::Error> {
     // Highlight,
     // PhraseBoost,
 
-    let indices = r#"
-    {
-        "commonness":{"boost":{"boost_type":"int"}},
-        "kanji[].commonness":{"boost":{"boost_type":"int"}},
-        "kana[].commonness":{"boost":{"boost_type":"int"}},
-        "meanings.ger[].rank":{"boost":{"boost_type":"int"}},
-        "kanji[].text": {"fulltext":{"tokenize":false}},
-        "kana[].text": {"fulltext":{"tokenize":false}},
-        "meanings.ger[].text": {"fulltext":{"tokenize":true}},
-        "meanings.eng[]": {"fulltext":{"tokenize":true}}
-    }
-    "#;
+    
     // let mut f = File::open("jmdict_split.json")?;
     // let mut s = String::new();
     // f.read_to_string(&mut s)?;
-    // println!("{:?}", search_lib::create::create_indices("jmdict", &s,  indices));
+    // println!("{:?}", veloci::create::create_indices("jmdict", &s,  indices));
 
     // create_indices_from_file(
     //     persistence: &mut Persistence,
@@ -97,8 +127,8 @@ fn create_jmdict_index() -> Result<(), io::Error> {
     //     create_cache: Option<CreateCache>,
     //     load_persistence: bool,
     // )
-    println!("{:?}", search_lib::create::create_indices_from_file(
-        &mut search_lib::persistence::Persistence::create("jmdict".to_string()).unwrap(),
+    println!("{:?}", veloci::create::create_indices_from_file(
+        &mut veloci::persistence::Persistence::create(target.to_string()).unwrap(),
         "jmdict_split.json",
         indices,
         None,
@@ -107,20 +137,20 @@ fn create_jmdict_index() -> Result<(), io::Error> {
 
 
     {
-        let mut pers = search_lib::persistence::Persistence::load("jmdict".to_string()).expect("Could not load persistence");
+        let mut pers = veloci::persistence::Persistence::load(target.to_string()).expect("Could not load persistence");
         let config = json!({"path": "meanings.ger[].text"});
         let mut f = File::open("deWords.json")?;
         let mut s = String::new();
         f.read_to_string(&mut s)?;
 
-        search_lib::create::add_token_values_to_tokens(&mut pers, &s, &config.to_string()).expect("Could not add token values");
+        veloci::create::add_token_values_to_tokens(&mut pers, &s, &config.to_string()).expect("Could not add token values");
 
         let config = json!({"path": "meanings.eng[]"});
         let mut f = File::open("enWords.json")?;
         let mut s = String::new();
         f.read_to_string(&mut s)?;
 
-        search_lib::create::add_token_values_to_tokens(&mut pers, &s, &config.to_string()).expect("Could not add token values");
+        veloci::create::add_token_values_to_tokens(&mut pers, &s, &config.to_string()).expect("Could not add token values");
 
     }
 
@@ -143,13 +173,13 @@ fn create_jmdict_index() -> Result<(), io::Error> {
 //     let mut f = File::open("deWords.json")?;
 //     let mut s = String::new();
 //     f.read_to_string(&mut s)?;
-//     println!("{:?}", search_lib::create::create_indices("desuggest", &s,  indices));
+//     println!("{:?}", veloci::create::create_indices("desuggest", &s,  indices));
 
 
 //     let mut f = File::open("engWords.json")?;
 //     let mut s = String::new();
 //     f.read_to_string(&mut s)?;
-//     println!("{:?}", search_lib::create::create_indices("engsuggest", &s,  indices));
+//     println!("{:?}", veloci::create::create_indices("engsuggest", &s,  indices));
 
 
 //     Ok(())
